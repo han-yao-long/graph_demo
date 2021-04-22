@@ -1,6 +1,6 @@
 
 import { PaintEngine } from "./PaintEngine"
-import { Item} from "./Item"
+import { Item } from "./Item"
 /** 视图 */
 export class View {
 
@@ -28,7 +28,8 @@ export class View {
 
     constructor(id: string) {
         this.canvasView = document.getElementById(id) as HTMLCanvasElement;
-        this.loop()
+        this.root.view = this;
+        this.loop();
     }
 
     /**
@@ -51,6 +52,24 @@ export class View {
      */
     update(): void {
         this._needDraw = true;
+    }
+
+    /**
+    * 添加 item 对象到场景。
+    *
+    * @param item        添加的对象
+    */
+    addItem(item: Item): void {
+        item.parent = this.root;
+    }
+
+    /**
+     * 从场景中移除 Item。
+     *
+     * @param item        被移除的对象
+     */
+    removeItem(item: Item): void {
+        item.parent = null;
     }
 
     /**
