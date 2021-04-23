@@ -1,5 +1,5 @@
 
-import { View } from "./view"
+import { View } from "./View"
 /** 引擎 */
 export class PaintEngine {
 
@@ -38,7 +38,6 @@ export class PaintEngine {
      */
     drawRect(data: any): void {
         if (!this.canvas) return;
-        debugger
         this.canvas.fillStyle = "red";
         this.canvas.strokeStyle = "blue";
         this.canvas.beginPath();

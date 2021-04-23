@@ -43,7 +43,7 @@ export class View {
             this.onDraw(painter);
         }
 
-        window.requestAnimationFrame(this.loop);
+        window.requestAnimationFrame(this.loop.bind(this));
     }
 
 
@@ -72,6 +72,7 @@ export class View {
         item.parent = null;
     }
 
+
     /**
      * 绘制视图
      *
@@ -83,9 +84,9 @@ export class View {
         painter.clearRect(0, 0, this.width, this.height);
         painter.restore();
 
-        // 绘制图
+        // 绘制item树
         painter.save();
-        painter.clearRect(0, 0, this.width, this.height);
+        this.root.onPaint(painter)
         painter.restore();
     }
 }
