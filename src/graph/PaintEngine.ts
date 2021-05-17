@@ -4,7 +4,7 @@ import { View } from "./View"
 export class PaintEngine {
 
     /** canvas 上下文 */
-    canvas: CanvasRenderingContext2D | null = null;
+    public canvas: CanvasRenderingContext2D | null = null;
 
     /**
      * 构造函数
@@ -127,7 +127,7 @@ export class PaintEngine {
     }
 
     /**
-     * 绘制文本
+     * 绘制圆形
      *
      * @param data 参数
      */
@@ -140,6 +140,23 @@ export class PaintEngine {
         this.canvas.stroke();
     }
 
+
+    /**
+     * 绘制圆弧
+     *
+     * @param cx    圆心 x 坐标
+     * @param cy    圆心 y 坐标
+     * @param r     圆半径
+     */
+    drawArc(cx: number, cy: number, r: number, startAngle: number = 0, endAngle: number = 0, isTrue = true): void {
+        if (!this.canvas) return;
+        this.canvas.beginPath();
+        this.canvas.arc(cx, cy, r, startAngle * Math.PI, endAngle * Math.PI, isTrue);
+        this.canvas.fill();
+        this.canvas.stroke();
+    }
+
+
     /**
      * 清空矩形区域
      *
@@ -148,5 +165,39 @@ export class PaintEngine {
     clearRect(x: number, y: number, width: number, height: number): void {
         if (!this.canvas) return;
         this.canvas.clearRect(x, y, width, height);
+    }
+
+    /**
+     * 平移变换
+     *
+     * @param x     X 轴方向平移
+     * @param y     Y 辆方向平移
+     */
+    translate(x: number, y: number): void {
+        if (!this.canvas) return;
+        this.canvas.translate(x, y);
+    }
+
+    /**
+     * 设置填充色
+     */
+    setFillstyle(v: string) {
+        if (!this.canvas) return;
+        this.canvas.fillStyle = v;
+    }
+    /**
+    * 设置边框色
+    */
+    setStrokeStyle(v: string) {
+        if (!this.canvas) return;
+        this.canvas.strokeStyle = v;
+    }
+
+    /**
+     * 设置线宽
+     */
+    setLineWidth(v: number) {
+        if (!this.canvas) return;
+        this.canvas.lineWidth = v
     }
 }

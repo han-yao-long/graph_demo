@@ -1,2 +1,4 @@
 import { Circle } from "./Circle"
-export { Circle }
+import {Img} from "./Img"
+import {Arc} from "./Arc"
+export { Circle, Img,Arc}

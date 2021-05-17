@@ -4,7 +4,25 @@ import { PaintEngine } from "./PaintEngine"
 /** 图例 */
 export class Item {
     /** 视图 */
-    view: View | null = null
+    view: View | null = null;
+
+    /** 是否符合移动条件 */
+    _isMoving: boolean = false;
+    /** 是否可移动 */
+    moveable: boolean = false;
+
+    /** 原点坐标 */
+    _origin: any = {
+        x: 0, y: 0
+    }
+    get origin() {
+        return this._origin;
+    }
+    set origin(v: any) {
+        this._origin.x = v.x;
+        this._origin.y = v.y;
+        this.update()
+    }
 
     /** parent 属性存值函数 */
     private _parent: Item | null = null;
@@ -49,6 +67,41 @@ export class Item {
         }
     }
 
+    /**
+     * Item 对象边界区域
+     *
+     * @return 对象边界区域
+     */
+    boundingRect(): any {
+        return {
+            x: 0,
+            y: 0,
+            width: 10,
+            height: 10
+        }
+    }
+
+    /**
+    * 判断 item 是否包含点 x, y
+    *
+    * @param x     横坐标（当前 item）
+    * @param y     纵坐标（当前 item）
+    * @return item 是否包含点 x, y
+    */
+    contains(x: number, y: number): boolean {
+
+        const left = this.boundingRect().x;
+        const right = this.boundingRect().x + this.boundingRect().width;
+        const top = this.boundingRect().y;
+        const bottom = this.boundingRect().y + this.boundingRect().height;
+        return (
+            x >= left &&
+            x <= right &&
+            y >= top &&
+            y <= bottom
+        );
+    }
+
 
     /**
      * 更新 Item
@@ -65,6 +118,7 @@ export class Item {
      * @param item  要添加的 item
      */
     addItem(item: Item): void {
+        item.view = this.view;
         item.parent = this;
     }
 
@@ -100,6 +154,102 @@ export class Item {
             // 恢复画布状态
             painter.restore();
         }
+    }
+
+    ///////////////////////////////////////////////////////
+    /**
+     *
+     * @param event   保存事件参数
+     * @return 是否处理事件
+     */
+    onMouseDown(event: any): boolean {
+        for (let i = this.children.length - 1; i >= 0; i--) {
+            try {
+                let item = this.children[i];
+                // 获取item下的坐标原点
+                const ce = event;
+                ce.sceneX = ce.sceneX + this.origin.x;
+                ce.sceneY = ce.sceneY + this.origin.y;
+                item.onMouseDown(event)
+                if (item.contains(ce.sceneX, ce.sceneY) && item.onMouseDown(event)) {
+                    // 如果点在子项目上且子项目处理了事件
+                    return true;
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        // 可移动
+        if (this.moveable) {
+            this._isMoving = true;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+ * 鼠标移动事件
+ *
+ * @param event   保存事件参数
+ * @return 是否处理事件
+ */
+    onMouseMove(event: any): boolean {
+        // 遍历子节点
+        for (let i = this.children.length - 1; i >= 0; i--) {
+            let item = this.children[i];
+            // 获取item下的坐标原点
+            const ce = event;
+            ce.sceneX = ce.sceneX + this.origin.x;
+            ce.sceneY = ce.sceneY + this.origin.y;
+            if (item.contains(ce.x, ce.y) && item.onMouseMove(ce)) {
+                // 如果点在子项目上且子项目处理了事件
+                return true;
+            }
+        }
+
+
+        if (this.moveable &&this._isMoving) {
+
+            const mp = this.toParentChange(
+                event.x - this._mouseDownPos.x,
+                event.y - this._mouseDownPos.y
+            );
+            this.moveTo(this.pos.x + mp.x, this.pos.y + mp.y);
+            this.$emit("onMove", old, this.pos);
+            // 刚开始移动存储旧的坐标
+            if (!this._oldPos) {
+                this._oldPos = old;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 释放鼠标事件
+     *
+     * @param event   保存事件参数
+     * @return 是否处理事件
+     */
+    onMouseUp(event: any): boolean {
+        // 遍历子节点
+        for (let i = this.children.length - 1; i >= 0; i--) {
+            let item = this.children[i];
+            const ce = event;
+            ce.sceneX = ce.sceneX + this.origin.x;
+            ce.sceneY = ce.sceneY + this.origin.y;
+            if (item.contains(ce.x, ce.y) && item.onMouseUp(ce)) {
+                // 如果点在子项目上且子项目处理了事件
+                return true;
+            }
+        };
+
+        // 处于移动态
+        if (this._isMoving) {
+            this._isMoving = false;
+        }
+        return false;
     }
 
     /**
