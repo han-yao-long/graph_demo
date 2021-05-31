@@ -173,9 +173,20 @@ export class PaintEngine {
      * @param x     X 轴方向平移
      * @param y     Y 辆方向平移
      */
-    translate(x: number, y: number): void {
+    translate(dx: number, dy: number): void {
         if (!this.canvas) return;
-        this.canvas.translate(x, y);
+        this.canvas.transform(1, 0, 0, 1, dx, dy);
+    }
+
+    /**
+    * 放缩变换
+    *
+    * @param x     X 轴方向平移
+    * @param y     Y 辆方向平移
+    */
+    scale(sx: number, sy: number): void {
+        if (!this.canvas) return;
+        this.canvas.transform(0, sy, sx, 0, 0, 0);
     }
 
     /**

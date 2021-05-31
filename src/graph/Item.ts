@@ -1,8 +1,11 @@
 import { View } from './View';
 import { PaintEngine } from "./PaintEngine"
+import { SMatrix } from "./until/SMatrix"
 
 /** 图例 */
 export class Item {
+
+
     /** 视图 */
     view: View | null = null;
 
@@ -11,18 +14,13 @@ export class Item {
     /** 是否可移动 */
     moveable: boolean = false;
 
-    /** 原点坐标 */
-    _origin: any = {
-        x: 0, y: 0
-    }
-    get origin() {
-        return this._origin;
-    }
-    set origin(v: any) {
-        this._origin.x = v.x;
-        this._origin.y = v.y;
-        this.update()
-    }
+    //当前图例的矩阵
+    SMatrix: SMatrix = new SMatrix()
+
+
+
+
+
 
     /** parent 属性存值函数 */
     private _parent: Item | null = null;
@@ -138,8 +136,13 @@ export class Item {
     * @param painter   绘制对象
     */
     onPaint(painter: PaintEngine): void {
+        painter.translate(this.SMatrix.e, this.SMatrix.f);
+        painter.scale(this.SMatrix.a, this.SMatrix.d);
         this.onDraw(painter);
+
         for (let item of this.children) {
+            // this.item.SMatrix.translate(this.x, this.y);
+            // this.item.SMatrix.scale(this.scale, this.scale)
             // 如果 item 不可见
             if (!item.visible) {
                 continue;
@@ -209,7 +212,7 @@ export class Item {
         }
 
 
-        if (this.moveable &&this._isMoving) {
+        if (this.moveable && this._isMoving) {
 
             const mp = this.toParentChange(
                 event.x - this._mouseDownPos.x,
