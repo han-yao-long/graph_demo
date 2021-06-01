@@ -174,6 +174,7 @@ export class Item {
                 ce.sceneX = ce.sceneX + this.origin.x;
                 ce.sceneY = ce.sceneY + this.origin.y;
                 item.onMouseDown(event)
+                
                 if (item.contains(ce.sceneX, ce.sceneY) && item.onMouseDown(event)) {
                     // 如果点在子项目上且子项目处理了事件
                     return true;
